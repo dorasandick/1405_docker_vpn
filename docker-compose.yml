@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  vpn-runner:
+    # Replace <your-github-username> with your actual username/org (in lowercase)
+    image: ghcr.io/dorasandick/ephemeral-runner:latest
+    container_name: ephemeral-runner
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+    environment:
+      - TAILSCALE_AUTH_KEY=${TAILSCALE_AUTH_KEY}
+      - RDP_PASSWORD=${RDP_PASSWORD}
+      - ENABLE_VPN=${ENABLE_VPN:-true}
+      - ENABLE_RDP=${ENABLE_RDP:-false}
+    restart: unless-stopped
+
+volumes:
+  tailscale-state:
